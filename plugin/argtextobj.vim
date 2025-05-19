@@ -146,7 +146,7 @@ function! s:GetOuterFunctionParenthesis(force_toplevel)
   silent! normal [(
   let rightup_p = getpos('.')
   while rightup_p != rightup_before
-    if ! a:force_toplevel && getline('.')[getpos('.')[2]-1-1] =~ '[a-zA-Z0-9_]'
+    if ! a:force_toplevel && getline('.')[getpos('.')[2]-1-1] =~ '[a-zA-Z0-9_ ]'
       " found a function
       break
     endif
