@@ -22,12 +22,14 @@
 "
 "   There is an option to descide whether the motion should go out to toplevel
 "   function or not in nested function application.
+"   To select arguments of the toplevel function, us capital 'A'.
 
 "
 "-----------------------------------------------------------------------------
 " Installation:
 "   Place this file in /usr/share/vim/vim*/plugin or ~/.vim/plugin/
-"   Now text-object like argument motion 'ia' and 'aa' is enabled by default.
+"   Now text-object like argument motion 'ia', 'aa', 'iA' and 'aA' is enabled
+"   by default.
 "
 "-----------------------------------------------------------------------------
 " Options:
@@ -53,7 +55,7 @@
 "     function(int arg1,    )
 "                          [I]
 "
-" case 3: smart argument recognition (g:argumentobject_force_toplevel = 0)
+" case 3: regular argument recognition ('_a')
 "     function(1, (20*30)+40, somefunc2(3, 4))
 "                   [N]  cia
 "     function(1, , somefunc2(3, 4))
@@ -63,13 +65,13 @@
 "     function(1, (20*30)+40, somefunc2(4))
 "                                      [I]
 "
-" case 4: smart argument recognition (g:argumentobject_force_toplevel = 1)
+" case 4: smart argument recognition ('_A')
 "     function(1, (20*30)+40, somefunc2(3, 4))
-"                   [N]  cia
+"                   [N]  ciA
 "     function(1, , somefunc2(3, 4))
 "                [I]
 "     function(1, (20*30)+40, somefunc2(3, 4))
-"                                      [N]  caa
+"                                      [N]  caA
 "     function(1, (20*30)+40)
 "                          [I]
 "
@@ -79,6 +81,10 @@
 "
 "-----------------------------------------------------------------------------
 " ChangeLog:
+"   1.2.0:
+"     - removed g:argumentobject_force_toplevel
+"     - replaced with 'a' and 'A' the equivalent of option set to 0 and 1
+"
 "   1.1.1:
 "     - debug (stop beeping on using text objects). Thanks to Nadav Samet.
 "
@@ -134,13 +140,13 @@ function! s:GetOutOfDoubleQuote()
   endif
 endfunction
 
-function! s:GetOuterFunctionParenthesis()
+function! s:GetOuterFunctionParenthesis(force_toplevel)
   let pos_save = getpos('.')
   let rightup_before = pos_save
   silent! normal [(
   let rightup_p = getpos('.')
   while rightup_p != rightup_before
-    if ! g:argumentobject_force_toplevel && getline('.')[getpos('.')[2]-1-1] =~ '[a-zA-Z0-9_]'
+    if ! a:force_toplevel && getline('.')[getpos('.')[2]-1-1] =~ '[a-zA-Z0-9_]'
       " found a function
       break
     endif
@@ -217,7 +223,7 @@ function! s:MoveRight(num)
   endif
 endfunction
 
-function! s:MotionArgument(inner, visual)
+function! s:MotionArgument(inner, visual, force_toplevel)
   let current_c = getline('.')[getpos('.')[2]-1]
   if current_c==',' || current_c=='('
     normal l
@@ -226,7 +232,7 @@ function! s:MotionArgument(inner, visual)
   " get out of "double quoted string" because [( does not take effect in it
   call <SID>GetOutOfDoubleQuote()
 
-  let rightup      = <SID>GetOuterFunctionParenthesis()       " on (
+  let rightup      = <SID>GetOuterFunctionParenthesis(a:force_toplevel)       " on (
   if getline(rightup[1])[rightup[2]-1]!='('
     " not in a function declaration nor call
     return
@@ -319,10 +325,14 @@ function! s:MotionArgument(inner, visual)
 endfunction
 
 " maping definition
-vnoremap <silent> ia <ESC>:call <SID>MotionArgument(1, 1)<CR>
-vnoremap <silent> aa <ESC>:call <SID>MotionArgument(0, 1)<CR>
-onoremap <silent> ia :call <SID>MotionArgument(1, 0)<CR>
-onoremap <silent> aa :call <SID>MotionArgument(0, 0)<CR>
+vnoremap <silent> ia <ESC>:call <SID>MotionArgument(1, 1, 0)<CR>
+vnoremap <silent> aa <ESC>:call <SID>MotionArgument(0, 1, 0)<CR>
+onoremap <silent> ia :call <SID>MotionArgument(1, 0, 0)<CR>
+onoremap <silent> aa :call <SID>MotionArgument(0, 0, 0)<CR>
+vnoremap <silent> iA <ESC>:call <SID>MotionArgument(1, 1, 1)<CR>
+vnoremap <silent> aA <ESC>:call <SID>MotionArgument(0, 1, 1)<CR>
+onoremap <silent> iA :call <SID>MotionArgument(1, 0, 1)<CR>
+onoremap <silent> aA :call <SID>MotionArgument(0, 0, 1)<CR>
 
 " option. turn 1 to search the most toplevel function
 let g:argumentobject_force_toplevel = 0
