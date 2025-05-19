@@ -117,12 +117,12 @@ function! s:GetOutOfDoubleQuote()
   endif
 
   while 1
-    exe 'silent! normal ^va"'
-    normal :\<ESC>\<CR>
+    exe 'silent! normal! ^va"'
+    normal! :\<ESC>\<CR>
     if getpos("'<")==getpos("'>")
       break
     endif
-    exe 'normal gvr' . repl
+    exe 'normal! gvr' . repl
   endwhile
 
   call setpos('.', pos_save)
@@ -132,7 +132,7 @@ function! s:GetOutOfDoubleQuote()
     if getpos('.')==getpos("'<")
       call <SID>MoveLeft(1)
     else
-      normal F"
+      normal! F"
     endif
   else
     " not in double quote
@@ -143,7 +143,7 @@ endfunction
 function! s:GetOuterFunctionParenthesis(force_toplevel)
   let pos_save = getpos('.')
   let rightup_before = pos_save
-  silent! normal [(
+  silent! normal! [(
   let rightup_p = getpos('.')
   while rightup_p != rightup_before
     if ! a:force_toplevel && getline('.')[getpos('.')[2]-1-1] =~ '[a-zA-Z0-9_ ]'
@@ -151,7 +151,7 @@ function! s:GetOuterFunctionParenthesis(force_toplevel)
       break
     endif
     let rightup_before = rightup_p
-    silent! normal [(
+    silent! normal! [(
     let rightup_p = getpos('.')
   endwhile
   call setpos('.', pos_save)
@@ -161,7 +161,7 @@ endfunction
 function! s:GetPair(pos)
   let pos_save = getpos('.')
   call setpos('.', a:pos)
-  normal %
+  normal! %
   call <SID>MoveLeft(1)
   let pair_pos = getpos('.')
   call setpos('.', pos_save)
@@ -173,9 +173,9 @@ function! s:GetInnerText(r1, r2)
   let reg_save = @@
   call setpos('.', a:r1)
   call <SID>MoveRight(1)
-  normal v
+  normal! v
   call setpos('.', a:r2)
-  normal y
+  normal! y
   let val = @@
   call setpos('.', pos_save)
   let @@ = reg_save
@@ -213,7 +213,7 @@ function! s:MoveLeft(num)
   if a:num>0
     " Use the motion that is by default in the 'whichwrap' setting
     " (i.e. '<bs>' instead of 'h')
-    exe "normal " . a:num . "\<bs>"
+    exe "normal! " . a:num . "\<bs>"
   endif
 endfunction
 
@@ -221,7 +221,7 @@ function! s:MoveRight(num)
   if a:num>0
     " Use the motion that is by default in the 'whichwrap' setting
     " (i.e. '<space>' instead of 'l')
-    exe "normal " . a:num . "\<space>"
+    exe "normal! " . a:num . "\<space>"
   endif
 endfunction
 
@@ -316,7 +316,7 @@ function! s:MotionArgument(inner, visual, force_toplevel)
     endif
   endif
 
-  exe 'normal v'
+  exe 'normal! v'
 
   call <SID>MoveRight(right)
   if delete_trailing_space
