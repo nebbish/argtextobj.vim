@@ -112,6 +112,7 @@ function! s:GetOutOfDoubleQuote()
   let mark_b = getpos("'<")
   let mark_e = getpos("'>")
   let repl='_'
+  let did_modify = 0
   if getline('.')[getpos('.')[2]-1]=='_'
     let repl='?'
   endif
@@ -123,20 +124,24 @@ function! s:GetOutOfDoubleQuote()
       break
     endif
     exe 'normal! gvr' . repl
+    let did_modify = 1
   endwhile
 
   call setpos('.', pos_save)
   if getline('.')[getpos('.')[2]-1]==repl
     " in double quote
-    call setline('.', line)
+    if did_modify
+      silent undo
+      call setpos('.', pos_save)
+    endif
     if getpos('.')==getpos("'<")
       call <SID>MoveLeft(1)
     else
       normal! F"
     endif
-  else
-    " not in double quote
-    call setline('.', line)
+  elseif did_modify
+    silent undo
+    call setpos('.', pos_save)
   endif
 endfunction
 
