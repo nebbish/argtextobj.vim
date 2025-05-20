@@ -175,6 +175,9 @@ function! s:GetInnerText(r1, r2)
   call <SID>MoveRight(1)
   normal! v
   call setpos('.', a:r2)
+  if &selection ==# 'exclusive'
+    call <SID>MoveRight(1)
+  endif
   normal! y
   let val = @@
   call setpos('.', pos_save)
@@ -297,6 +300,10 @@ function! s:MotionArgument(inner, visual, force_toplevel)
     call <SID>MoveRight(1)
     call <SID>MoveToNextNonSpace()
     call <SID>MoveLeft(1)
+  endif
+
+  if &selection ==# 'exclusive'
+    call <SID>MoveRight(1)
   endif
 endfunction
 
