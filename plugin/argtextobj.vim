@@ -150,6 +150,9 @@ function! s:GetOuterFunctionParenthesis(force_toplevel)
   let rightup_before = pos_save
   silent! normal! [(
   let rightup_p = getpos('.')
+  if rightup_p == rightup_before
+    return []
+  endif
   while rightup_p != rightup_before
     if ! a:force_toplevel && getline('.')[getpos('.')[2]-1-1] =~ '[a-zA-Z0-9_ ]'
       " found a function
@@ -262,31 +265,30 @@ function! s:MotionArgument(inner, visual, force_toplevel)
     return
   endif
   let rightup_pair = <SID>GetPair(rightup)                    " before )
+  if rightup_pair == rightup
+    " no matching right parenthesis found, search for incomplete function
+    " definition until end of current line.
+    let rightup_pair = [0, line('.'), col('$'), 0]
+  endif
   let arglist_str  = <SID>GetInnerText(rightup, rightup_pair) " inside ()
-  let arglist_sub  = arglist_str
-  " cursor offset from rightup
-  if getpos('.')[1] == rightup[1]
-    let offset = getpos('.')[2] - rightup[2] - 1
+  if getline('.')[rightup[2]-1]=='('
+    " left parenthesis in the current line
+    " cursor offset from rightup
+    let offset  = getpos('.')[2] - rightup[2] - 1 " -1 for the removed parenthesis
   else
-    let offset = 0
-    " NOTE: this calculation includes each newline as +1
-    " Because the calculation of how far to move left & right
-    " is done against the *extracted text* which contains
-    " newlines, and those motions start from the offset we
-    " calculate here. Even ff=dos files' newlines are just
-    " "\n" in the extracted string.
-    for i in range(rightup[1], getpos('.')[1])
-      if i == rightup[1]
-        let offset += len(getline(i)) - rightup[2]
-      elseif i == getpos('.')[1]
-        let offset += getpos('.')[2]
-      else
-        let offset += len(getline(i)) + 1
+    " left parenthesis in a previous line; retrieve the (partial when there's a
+    " matching right parenthesis) current line from the arglist_str.
+    for line in split(arglist_str, "\n")
+      if stridx(getline('.'), line) == 0
+        let arglist_str = line
+        break
       endif
     endfor
+    let offset  = getpos('.')[2] - 1
   endif
 
   " replace all parentheses and commas inside them to '_'
+  let arglist_sub  = arglist_str
   let arglist_sub = substitute(arglist_sub, "'".'\([^'."'".']\{-}\)'."'", '\="(".substitute(submatch(1), ".", "_", "g").")"', 'g') " replace '..' => (__)
   let arglist_sub = substitute(arglist_sub, '\[\([^'."'".']\{-}\)\]', '\="(".substitute(submatch(1), ".", "_", "g").")"', 'g')     " replace [..] => (__)
   let arglist_sub = substitute(arglist_sub, '<\([^'."'".']\{-}\)>', '\="(".substitute(submatch(1), ".", "_", "g").")"', 'g')       " replace <..> => (__)
@@ -311,7 +313,7 @@ function! s:MotionArgument(inner, visual, force_toplevel)
 
   """echo 'on(='. rightup[2] . ' before)=' . rightup_pair[2]
   """echo arglist_str
-  """echo arglist_sub
+  """echo arglist_sub strlen(arglist_sub)
   """echo offset
   """echo 'argbegin='. thisargbegin . '  argend='. thisargend
   """echo 'left=' . left . '  right='. right
