@@ -186,7 +186,7 @@ function! s:GetInnerText(r1, r2)
   if &selection ==# 'exclusive'
     call <SID>MoveRight(1)
   endif
-  normal! y
+  silent normal! y
   let val = @@
   call setpos('.', pos_save)
   call setreg('"', reg_save, regtype_save)
