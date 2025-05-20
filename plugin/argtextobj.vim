@@ -205,6 +205,9 @@ function! s:GetNextCommaOrEndArgs(arglist, offset, count)
   while c > 0
     let commapos = stridx(a:arglist, ',', commapos + 1)
     if commapos == -1
+      if c > 1
+        execute "normal! \<C-\>\<C-n>\<Esc>" | " Beep.
+      endif
       return strlen(a:arglist)-1
     endif
     let c -= 1
@@ -252,6 +255,7 @@ function! s:MotionArgument(inner, visual, force_toplevel)
   let rightup      = <SID>GetOuterFunctionParenthesis(a:force_toplevel)       " on (
   if getline('.')[rightup[2]-1]!='('
     " not in a function declaration nor call
+    execute "normal! \<C-\>\<C-n>\<Esc>" | " Beep.
     return
   endif
   let rightup_pair = <SID>GetPair(rightup)                    " before )
