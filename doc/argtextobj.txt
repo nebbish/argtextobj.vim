@@ -22,18 +22,6 @@ because it recognizes inclusion relationship of parentheses.
 2. OPTIONS ~
                                                         *argtextobj-options*
 
->
-  g:argumentobject_mapping
-<
-  Default: 'a'
-  Sets the default mapping for the text-object. You may want to change this
-  in case you have mapped 'a' to a different text-objext like angle brackets.
->
-  g:argumentobject_force_toplevel
-<
-  Default: 0
-  Descide whether the motion should go out to toplevel function or not in
-  nested functions.
 
                                                           *argtextobj-remap*
 If you want to use different mappings, map your keys to the

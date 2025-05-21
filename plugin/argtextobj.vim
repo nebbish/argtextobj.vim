@@ -105,13 +105,6 @@ if exists('loaded_argtextobj') || &cp || version < 700
 endif
 let loaded_argtextobj = 1
 
-" option. sets the mapping to use for this textobject
-let g:argumentobject_mapping =
-  \ get(g:, 'argumentobject_mapping', 'a')
-let g:argumentobject_force_mapping =
-  \ get(g:, 'argumentobject_force_mapping', 'A')
-
-
 xnoremap <silent> <Plug>(argtextobj_ia) :<C-U>call argtextobj#MotionArgument(1, 1, 0)<CR>
 xnoremap <silent> <Plug>(argtextobj_aa) :<C-U>call argtextobj#MotionArgument(0, 1, 0)<CR>
 onoremap <silent> <Plug>(argtextobj_ia) :<C-U>call argtextobj#MotionArgument(1, 0, 0)<CR>
