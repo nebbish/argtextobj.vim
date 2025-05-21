@@ -111,11 +111,39 @@ let g:argumentobject_mapping =
 let g:argumentobject_force_mapping =
   \ get(g:, 'argumentobject_force_mapping', 'A')
 
-" On-demand loading. Let's use the autoload folder and not slow down vim's
-" " startup procedure.
-augroup argtextobjStart
-  autocmd!
-  autocmd VimEnter * call argtextobj#Enable()
-augroup END
+
+xnoremap <silent> <Plug>(argtextobj_ia) :<C-U>call argtextobj#MotionArgument(1, 1, 0)<CR>
+xnoremap <silent> <Plug>(argtextobj_aa) :<C-U>call argtextobj#MotionArgument(0, 1, 0)<CR>
+onoremap <silent> <Plug>(argtextobj_ia) :<C-U>call argtextobj#MotionArgument(1, 0, 0)<CR>
+onoremap <silent> <Plug>(argtextobj_aa) :<C-U>call argtextobj#MotionArgument(0, 0, 0)<CR>
+xnoremap <silent> <Plug>(argtextobj_iA) :<C-U>call argtextobj#MotionArgument(1, 1, 1)<CR>
+xnoremap <silent> <Plug>(argtextobj_aA) :<C-U>call argtextobj#MotionArgument(0, 1, 1)<CR>
+onoremap <silent> <Plug>(argtextobj_iA) :<C-U>call argtextobj#MotionArgument(1, 0, 1)<CR>
+onoremap <silent> <Plug>(argtextobj_aA) :<C-U>call argtextobj#MotionArgument(0, 0, 1)<CR>
+
+if ! hasmapto('<Plug>(argtextobj_ia)', 'x')
+  xmap ia <Plug>(argtextobj_ia)
+endif
+if ! hasmapto('<Plug>(argtextobj_aa)', 'x')
+  xmap aa <Plug>(argtextobj_aa)
+endif
+if ! hasmapto('<Plug>(argtextobj_ia)', 'o')
+  omap ia <Plug>(argtextobj_ia)
+endif
+if ! hasmapto('<Plug>(argtextobj_aa)', 'o')
+  omap aa <Plug>(argtextobj_aa)
+endif
+if ! hasmapto('<Plug>(argtextobj_iA)', 'x')
+  xmap iA <Plug>(argtextobj_iA)
+endif
+if ! hasmapto('<Plug>(argtextobj_aA)', 'x')
+  xmap aA <Plug>(argtextobj_aA)
+endif
+if ! hasmapto('<Plug>(argtextobj_iA)', 'o')
+  omap iA <Plug>(argtextobj_iA)
+endif
+if ! hasmapto('<Plug>(argtextobj_aA)', 'o')
+  omap aA <Plug>(argtextobj_aA)
+endif
 
 " vim: set foldmethod=marker et ts=2 sts=2 sw=2:
