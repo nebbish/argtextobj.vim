@@ -63,6 +63,9 @@ function! s:GetPair(pos)
   let pos_save = getpos('.')
   call setpos('.', a:pos)
   normal! %
+  if a:pos == getpos('.')
+    return []
+  endif
   call <SID>MoveLeft(1)
   let pair_pos = getpos('.')
   call setpos('.', pos_save)
@@ -155,11 +158,14 @@ function! argtextobj#MotionArgument(inner, visual, force_toplevel)
     return
   endif
   let rightup_pair = <SID>GetPair(rightup)                    " before )
-  if rightup_pair == rightup
+  echo rightup
+  if empty(rightup_pair)
+    echo "success"
     " no matching right parenthesis found, search for incomplete function
     " definition until end of current line.
     let rightup_pair = [0, line('.'), col('$'), 0]
   endif
+  echo rightup_pair
   let arglist_str  = <SID>GetInnerText(rightup, rightup_pair) " inside ()
   if line('.')==rightup[1]
     " left parenthesis in the current line
