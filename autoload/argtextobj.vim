@@ -206,7 +206,8 @@ function! argtextobj#MotionArgument(inner, visual, force_toplevel)
   """echo 'left=' . left . '  right='. right
 
   let delete_trailing_space = 0
-  if a:inner
+  " only do inner matching when argument list is not empty
+  if a:inner && arglist_sub !~# "^\s\+$"
     " ia
     call <SID>MoveLeft(left)
     let right -= <SID>MoveToNextNonSpace()
